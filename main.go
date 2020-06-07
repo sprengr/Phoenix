@@ -1,14 +1,17 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"html"
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 )
 
-const Version = "ver1"
+// const Version = "ver3"
+var Version string
 
 var (
 	pageTemplate = `
@@ -29,7 +32,18 @@ href="install">Upgrade</a>{{end}}
 	Status = struct{ Version, NewVersion string }{Version, ""}
 )
 
+func checkVersionFlag() {
+	var flgVersion bool
+	flag.BoolVar(&flgVersion, "version", false, "if true, print version and exit")
+	flag.Parse()
+	if flgVersion {
+		fmt.Printf(Version)
+		os.Exit(0)
+	}
+}
+
 func main() {
+	checkVersionFlag()
 	page, err := template.New("page").Parse(pageTemplate)
 	if err != nil {
 		log.Fatal(err)
