@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/sprengr/Phoenix/cli"
 	"github.com/sprengr/Phoenix/render"
@@ -46,8 +47,24 @@ func main() {
 	go func() {
 		log.Fatal(http.ListenAndServe(":8080", nil))
 	}()
-
 	log.Println("Serving")
+
+	checkPeriodically()
+
 	<-update.Shutdown
 	log.Println("Shutting down as newer version is running")
+}
+
+func checkPeriodically() {
+	ticker := time.NewTicker(3 * time.Second)
+	go func() {
+		for {
+			select {
+			case <-ticker.C:
+				if release, ok := update.Check(Version); ok {
+					Status.VersionFound = release.Version
+				}
+			}
+		}
+	}()
 }
