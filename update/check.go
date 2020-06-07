@@ -106,6 +106,31 @@ func Install(release Release) bool {
 	return true
 }
 
+func Cleanup() {
+	currentVersion, err := os.Executable()
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
+	oldVersionStat, err := os.Stat(asOld(currentVersion))
+	if os.IsNotExist(err) {
+		return
+	}
+
+	if !oldVersionStat.Mode().IsRegular() {
+		log.Printf("Previous version found (%v) but we ignore it as it's not a regular file")
+		return
+	}
+
+	err = os.Remove(asOld(currentVersion))
+
+	if err != nil {
+		log.Fatal("Couldn't remove previous version: %v", err)
+		return
+	}
+}
+
 func copy(src, dst string) (int64, error) {
 	sourceFileStat, err := os.Stat(src)
 	if err != nil {

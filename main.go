@@ -49,6 +49,7 @@ func clientRedirectHome(w http.ResponseWriter) {
 
 func main() {
 	checkVersionFlag()
+	update.Cleanup()
 	done := make(chan bool, 1)
 	page, err := template.New("page").Parse(pageTemplate)
 	if err != nil {
