@@ -49,6 +49,7 @@ func clientRedirectHome(w http.ResponseWriter) {
 
 func main() {
 	checkVersionFlag()
+	done := make(chan bool, 1)
 	page, err := template.New("page").Parse(pageTemplate)
 	if err != nil {
 		log.Fatal(err)
@@ -69,9 +70,16 @@ func main() {
 	http.HandleFunc("/install", func(w http.ResponseWriter, r *http.Request) {
 		if ok, release := update.Check(Version); ok && update.Install(release) {
 			clientRedirectHome(w)
+			done <- true
 		} else {
 			fmt.Fprint(w, "Nothing to install 😟")
 		}
 	})
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	go func() {
+		log.Fatal(http.ListenAndServe(":8080", nil))
+	}()
+	log.Println("Serving")
+
+	<-done
+	log.Println("Shutting down as newer version is running")
 }

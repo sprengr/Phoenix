@@ -96,6 +96,13 @@ func Install(release Release) bool {
 
 	log.Printf("Copied new version %v (%d)", currentVersion, nBytes)
 
+	err = start(currentVersion)
+	if err != nil {
+		log.Fatal(err)
+		return false
+	}
+
+	log.Printf("Successfully updated")
 	return true
 }
 
@@ -124,4 +131,14 @@ func copy(src, dst string) (int64, error) {
 
 	nBytes, err := io.Copy(destination, source)
 	return nBytes, err
+}
+
+func start(process string) error {
+	_, err := os.Stat(process)
+	if os.IsNotExist(err) {
+		return err
+	}
+
+	cmd := exec.Command(process)
+	return cmd.Start()
 }
