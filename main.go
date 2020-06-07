@@ -11,8 +11,6 @@ import (
 	"github.com/sprengr/Updater/update"
 )
 
-// const Version = "ver3"
-
 var (
 	Version string
 	Status  = struct{ Version, VersionFound, VersionInstalled string }{Version, "", ""}
@@ -26,30 +24,29 @@ func main() {
 
 	update.Cleanup()
 
-	done := make(chan bool, 1)
-
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		render.Index(w, Status)
 	})
 
 	http.HandleFunc("/check", func(w http.ResponseWriter, r *http.Request) {
-		if ok, release := update.Check(Version); ok {
+		if release, ok := update.Check(Version); ok {
 			Status.VersionFound = release.Version
 		}
 		render.Check(w, Status)
 	})
 	http.HandleFunc("/install", func(w http.ResponseWriter, r *http.Request) {
-		if ok, release := update.Check(Version); ok && update.Install(release) {
-			done <- true
+		release, ok := update.Check(Version)
+		if ok && update.Install(release) {
 			Status.VersionInstalled = release.Version
 		}
 		render.Install(w, Status)
 	})
+
 	go func() {
 		log.Fatal(http.ListenAndServe(":8080", nil))
 	}()
 
 	log.Println("Serving")
-	<-done
+	<-update.Shutdown
 	log.Println("Shutting down as newer version is running")
 }
