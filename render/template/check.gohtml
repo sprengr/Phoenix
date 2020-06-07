@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title> Server {{.Version}} </title>
+</head>
+
+<body>
+    {{if .VersionFound}}
+    <h1>New version is available: {{.VersionFound}}</h1>
+    <a href="install">Upgrade</a>
+    {{else}}
+    <p>You are already on the latest available version 🚀</p>
+    {{end}}
+</body>
+
+</html>

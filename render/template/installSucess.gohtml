@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title> Server {{.Version}} {{if .VersionInstalled}} ➡ {{.VersionInstalled}} {{end}} </title>
+</head>
+
+<body>
+    {{if .VersionInstalled}}
+    <h1>Successfully updated from {{.Version}} to version {{.VersionInstalled}}</h1>
+    {{else}}
+    <p>Nothing to install 😟</p>
+    {{end}}
+    <p>Redirecting to home...</p>
+    <a href="/">I'm impatient</a>
+    <br>
+</body>
+
+</html>
+
+<script>setTimeout(function () { window.location.replace('/') }, 3000)</script>
