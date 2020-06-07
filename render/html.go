@@ -25,7 +25,7 @@ func Check(w http.ResponseWriter, data interface{}) {
 }
 
 func Install(w http.ResponseWriter, data interface{}) {
-	if err := tmpl.ExecuteTemplate(w, "installSucess.gohtml", data); err != nil {
+	if err := tmpl.ExecuteTemplate(w, "install.gohtml", data); err != nil {
 		log.Fatal(err)
 	}
 }

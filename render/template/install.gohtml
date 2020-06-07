@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title> Server {{.Version}} </title>
+    <title> Server {{.Version}} {{if .VersionInstalled}} ➡ {{.VersionInstalled}} {{end}} </title>
     <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
 </head>
 
@@ -10,9 +10,11 @@
     <div class="max-w-sm rounded overflow-hidden shadow-lg container mx-auto">
         <div class="px-6 py-4">
             <div class="font-bold text-xl mb-2">Phoenix Version {{.Version}}</div>
-            {{if .VersionFound}}
+            {{if .VersionInstalled}}
             <p class="text-gray-700 text-base">
-                New version is available: {{.VersionFound}}
+                Successfully updated from {{.Version}} to {{.VersionInstalled}}
+                <br>
+                🎉
             </p>
             {{else}}
             <p class="text-gray-700 text-base">
@@ -20,14 +22,15 @@
             </p>
             {{end}}
 
+            <br>
+            <p class="text-gray-700 text-base">
+                Redirecting to home...
+            </p>
         </div>
         <div class="px-6 py-4">
-            <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2">
-                <a href="/">Home</a>
-            </span>
             {{if .VersionFound}}
             <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2">
-                <a href="install">Upgrade</a>
+                <a href="/">Home</a>
             </span>
             {{end}}
         </div>
@@ -35,3 +38,5 @@
 </body>
 
 </html>
+
+<script>setTimeout(function () { window.location.replace('/') }, 3000)</script>
