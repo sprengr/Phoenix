@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/sprengr/Updater/cli"
-	"github.com/sprengr/Updater/render"
-	"github.com/sprengr/Updater/update"
+	"github.com/sprengr/Phoenix/cli"
+	"github.com/sprengr/Phoenix/render"
+	"github.com/sprengr/Phoenix/update"
 )
 
 var (
@@ -34,6 +34,7 @@ func main() {
 		}
 		render.Check(w, Status)
 	})
+
 	http.HandleFunc("/install", func(w http.ResponseWriter, r *http.Request) {
 		release, ok := update.Check(Version)
 		if ok && update.Install(release) {

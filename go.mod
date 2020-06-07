@@ -1,3 +1,3 @@
-module github.com/sprengr/Updater
+module github.com/sprengr/Phoenix
 
 go 1.14
