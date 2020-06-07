@@ -12,13 +12,16 @@ import (
 
 const releasesPath = "./releases"
 
+// Shutdown will get written to after a successfull update.
 var Shutdown chan bool = make(chan bool, 1)
 
+// Release represents a new installable release
 type Release struct {
 	Version    string
 	executable string
 }
 
+// Cleanup checks and removes old installations.
 func Cleanup() {
 	currentVersion, err := os.Executable()
 	if err != nil {
@@ -44,6 +47,8 @@ func Cleanup() {
 	}
 }
 
+// Check looks in `releasesPath` for new installations.
+// It returns release information and an ok flag.
 func Check(currentVersion string) (Release, bool) {
 	executable, ok := getExecutable()
 
@@ -97,6 +102,8 @@ func asUpdate(process string) string {
 	return releasesPath + "/" + process
 }
 
+// Install a new release. A successfull installation writes into the Shutdown channel.
+// It returns an ok flag.
 func Install(release Release) bool {
 	currentVersion, err := os.Executable()
 	if err != nil {
