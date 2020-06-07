@@ -1,13 +1,13 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"html/template"
 	"log"
 	"net/http"
 	"os"
 
+	"github.com/sprengr/Updater/cli"
 	"github.com/sprengr/Updater/update"
 )
 
@@ -33,24 +33,20 @@ href="install">Upgrade</a>{{end}}
 	Status = struct{ Version, NewVersion string }{Version, ""}
 )
 
-func checkVersionFlag() {
-	var flgVersion bool
-	flag.BoolVar(&flgVersion, "version", false, "if true, print version and exit")
-	flag.Parse()
-	if flgVersion {
-		fmt.Printf(Version)
-		os.Exit(0)
-	}
-}
-
 func clientRedirectHome(w http.ResponseWriter) {
 	fmt.Fprint(w, "<script>window.location.replace('/')</script>")
 }
 
 func main() {
-	checkVersionFlag()
+	if cli.VersionFlag() {
+		fmt.Print(Version)
+		os.Exit(0)
+	}
+
 	update.Cleanup()
+
 	done := make(chan bool, 1)
+
 	page, err := template.New("page").Parse(pageTemplate)
 	if err != nil {
 		log.Fatal(err)
