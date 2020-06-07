@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"html"
 	"html/template"
 	"log"
 	"net/http"
@@ -44,6 +43,10 @@ func checkVersionFlag() {
 	}
 }
 
+func clientRedirectHome(w http.ResponseWriter) {
+	fmt.Fprint(w, "<script>window.location.replace('/')</script>")
+}
+
 func main() {
 	checkVersionFlag()
 	page, err := template.New("page").Parse(pageTemplate)
@@ -64,7 +67,11 @@ func main() {
 		}
 	})
 	http.HandleFunc("/install", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Not implemented %v", html.EscapeString(r.URL.Path))
+		if ok, release := update.Check(Version); ok && update.Install(release) {
+			clientRedirectHome(w)
+		} else {
+			fmt.Fprint(w, "Nothing to install 😟")
+		}
 	})
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

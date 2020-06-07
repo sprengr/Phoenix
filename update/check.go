@@ -58,6 +58,9 @@ func checkRelease() (bool, string) {
 func asUpdate(process string) string {
 	return releasesPath + "/" + process
 }
+func asOld(process string) string {
+	return process + ".old"
+}
 
 func getVersion(process string) (bool, string) {
 	cmd := exec.Command(asUpdate(process), "--version")
@@ -69,3 +72,56 @@ func getVersion(process string) (bool, string) {
 	return true, string(out)
 }
 
+func Install(release Release) bool {
+	currentVersion, err := os.Executable()
+
+	if err != nil {
+		log.Fatal(err)
+		return false
+	}
+
+	err = os.Rename(currentVersion, asOld(currentVersion))
+	if err != nil {
+		log.Fatal(err)
+		return false
+	}
+
+	log.Printf("Renamed current executable to %v", asOld(currentVersion))
+
+	nBytes, err := copy(asUpdate(release.executable), currentVersion)
+	if err != nil {
+		log.Fatal(err)
+		return false
+	}
+
+	log.Printf("Copied new version %v (%d)", currentVersion, nBytes)
+
+	return true
+}
+
+func copy(src, dst string) (int64, error) {
+	sourceFileStat, err := os.Stat(src)
+	if err != nil {
+		log.Fatal(err)
+		return 0, err
+	}
+
+	if !sourceFileStat.Mode().IsRegular() {
+		return 0, fmt.Errorf("%s is not a regular file", src)
+	}
+
+	source, err := os.Open(src)
+	if err != nil {
+		return 0, err
+	}
+	defer source.Close()
+
+	destination, err := os.Create(dst)
+	if err != nil {
+		return 0, err
+	}
+	defer destination.Close()
+
+	nBytes, err := io.Copy(destination, source)
+	return nBytes, err
+}
