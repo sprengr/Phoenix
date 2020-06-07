@@ -8,6 +8,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/sprengr/Updater/update"
 )
 
 // const Version = "ver3"
@@ -54,7 +56,12 @@ func main() {
 		}
 	})
 	http.HandleFunc("/check", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Not implemented %v", html.EscapeString(r.URL.Path))
+		if ok, release := update.Check(Version); ok {
+			fmt.Fprintf(w, "New version is available: %v", release.Version)
+			Status.NewVersion = release.Version
+		} else {
+			fmt.Fprint(w, "You are already on the latest version 🚀")
+		}
 	})
 	http.HandleFunc("/install", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Not implemented %v", html.EscapeString(r.URL.Path))
